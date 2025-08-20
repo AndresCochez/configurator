@@ -13,7 +13,14 @@ button{flex:1;padding:10px 14px;border-radius:12px;border:1px solid var(--border
 button.secondary{background:#fff;color:var(--text)}.badge{display:inline-flex;gap:6px;align-items:center;background:var(--accent-weak);color:var(--accent);padding:6px 10px;border-radius:999px;font-size:.82rem}
 small{color:var(--muted)}
 
-</style></head>
+</style>
+
+<script type="module">
+  // Haal API-URL uit Vite ENV (Vercel) en zet als globale fallback
+  window.API_URL = (import.meta?.env?.VITE_API_URL || '').toString().trim();
+</script>
+
+</head>
 <body>
 <div class="panel">
   <div class="brand"><span class="dot"></span><h1>Configurator - Ben & Jerry's</h1></div>
@@ -351,7 +358,10 @@ document.getElementById('saveApi').addEventListener('click', ()=>{
 // Order
 function flavorHexPlain(n){ if(n==='vanille')return'#FFFACD'; if(n==='chocolade')return'#8B4513'; if(n==='pistache')return'#8FD19E'; return'#FFFACD'; }
 async function placeOrder(){
-  const base = (localStorage.getItem('API_URL')||'').trim() || 'http://localhost:5000';
+  const base = (window.API_URL || localStorage.getItem('API_URL') || 'http://localhost:5000')
+   .toString()
+   .trim();
+
   const scoopFlavor = document.getElementById('scoopFlavor').value;
   const sprinklesLevel = document.getElementById('sprinkles').value;
   const coneStyle = document.getElementById('coneStyle').value;
