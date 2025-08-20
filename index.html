@@ -16,7 +16,7 @@ small{color:var(--muted)}
 </style>
 
 <script type="module">
-  // Haal API-URL uit Vite ENV (Vercel) en zet als globale fallback
+  // Leest de API-URL uit Vercel/Vite (ENV) en zet ze globaal
   window.API_URL = (import.meta?.env?.VITE_API_URL || '').toString().trim();
 </script>
 
@@ -359,8 +359,9 @@ document.getElementById('saveApi').addEventListener('click', ()=>{
 function flavorHexPlain(n){ if(n==='vanille')return'#FFFACD'; if(n==='chocolade')return'#8B4513'; if(n==='pistache')return'#8FD19E'; return'#FFFACD'; }
 async function placeOrder(){
   const base = (window.API_URL || localStorage.getItem('API_URL') || 'http://localhost:5000')
-   .toString()
-   .trim();
+  .toString()
+  .trim();
+
 
   const scoopFlavor = document.getElementById('scoopFlavor').value;
   const sprinklesLevel = document.getElementById('sprinkles').value;
