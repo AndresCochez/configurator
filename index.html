@@ -14,12 +14,6 @@ button.secondary{background:#fff;color:var(--text)}.badge{display:inline-flex;ga
 small{color:var(--muted)}
 
 </style>
-
-<script type="module">
-  // Leest de API-URL uit Vercel/Vite (ENV) en zet ze globaal
-  window.API_URL = (import.meta?.env?.VITE_API_URL || '').toString().trim();
-</script>
-
 </head>
 <body>
 <div class="panel">
@@ -50,6 +44,15 @@ small{color:var(--muted)}
   <div style="display: none;" class="row"><label for="apiUrl"></label><input id="apiUrl"/><button class="secondary" id="saveApi">Opslaan</button></div>
 </div>
 <script type="module">// GLB-only configurator: adjust ONLY GLB materials (no extra geometry)
+// ENV → globale variabele (nu binnen het module-script i.p.v. inline in <head>)
+window.API_URL = (import.meta?.env?.VITE_API_URL || '').toString().trim();
+
+// Gebruik Render in productie; enkel lokaal → localhost
+const DEFAULT_API =
+  (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:5000'
+    : 'https://backend-tjlb.onrender.com';
+
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
@@ -358,10 +361,9 @@ document.getElementById('saveApi').addEventListener('click', ()=>{
 // Order
 function flavorHexPlain(n){ if(n==='vanille')return'#FFFACD'; if(n==='chocolade')return'#8B4513'; if(n==='pistache')return'#8FD19E'; return'#FFFACD'; }
 async function placeOrder(){
-  const base = (window.API_URL || localStorage.getItem('API_URL') || 'http://localhost:5000')
+  const base = (window.API_URL || localStorage.getItem('API_URL') || DEFAULT_API)
   .toString()
   .trim();
-
 
   const scoopFlavor = document.getElementById('scoopFlavor').value;
   const sprinklesLevel = document.getElementById('sprinkles').value;
