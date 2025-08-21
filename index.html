@@ -1,405 +1,409 @@
 <!DOCTYPE html>
 <html lang="nl">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Configurator - Ben & Jerry's</title>
-<style>
-
-:root{--sb-green:#006241;--sb-forest:#1E3932;--sb-foam:#D4E9E2;--bg:#fff;--panel:#fff;--muted:#6b7280;--text:#111827;--border:#e5e7eb;--accent:#006241;--accent-weak:rgba(0,98,65,.12);--radius:16px;--shadow:0 10px 30px rgba(0,0,0,.08)}
-*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:linear-gradient(180deg,#fff 0%,#faf7fb 100%);font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;color:var(--text)}canvas{display:block}
-.panel{position:fixed;top:18px;left:18px;width:320px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
-.brand{display:flex;gap:10px;align-items:center;margin-bottom:10px}.dot{width:10px;height:10px;border-radius:999px;background:var(--accent)}.brand h1{font-size:1.1rem;margin:0}
-.row{display:grid;gap:6px;margin:10px 0 12px}label{font-size:.85rem;color:var(--muted)}select,input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px}
-select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-weak)}.actions{display:flex;gap:8px;margin-top:8px}
-button{flex:1;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--accent);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(0,98,65,.22)}
-button.secondary{background:#fff;color:var(--text)}.badge{display:inline-flex;gap:6px;align-items:center;background:var(--accent-weak);color:var(--accent);padding:6px 10px;border-radius:999px;font-size:.82rem}
-small{color:var(--muted)}
-
-</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Configurator - Ben & Jerry's</title>
+  <style>
+    :root{--sb-green:#006241;--sb-forest:#1E3932;--sb-foam:#D4E9E2;--bg:#fff;--panel:#fff;--muted:#6b7280;--text:#111827;--border:#e5e7eb;--accent:#006241;--accent-weak:rgba(0,98,65,.12);--radius:16px;--shadow:0 10px 30px rgba(0,0,0,.08)}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,#fff 0%,#faf7fb 100%);font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;color:var(--text)}
+    canvas{display:block}
+    .panel{position:fixed;top:18px;left:18px;width:320px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .brand{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+    .dot{width:10px;height:10px;border-radius:999px;background:var(--accent)}
+    .brand h1{font-size:1.1rem;margin:0}
+    .row{display:grid;gap:6px;margin:10px 0 12px}
+    label{font-size:.85rem;color:var(--muted)}
+    select,input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px}
+    select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-weak)}
+    .actions{display:flex;gap:8px;margin-top:8px}
+    button{flex:1;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--accent);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(0,98,65,.22)}
+    button.secondary{background:#fff;color:var(--text)}
+    .badge{display:inline-flex;gap:6px;align-items:center;background:var(--accent-weak);color:var(--accent);padding:6px 10px;border-radius:999px;font-size:.82rem}
+    small{color:var(--muted)}
+  </style>
 </head>
 <body>
-<div class="panel">
-  <div class="brand"><span class="dot"></span><h1>Configurator - Ben & Jerry's</h1></div>
-  <div class="row"><label for="scoopFlavor">Bolletje</label>
-  <select id="scoopFlavor">
-    <option value="vanille" selected>Vanille</option>
-    <option value="chocolade">Chocolade</option>
-    <option value="pistache">Pistache</option>
-  </select>
-</div>
-<div class="row"><label for="coneStyle">Hoorntje</label>
-  <select id="coneStyle">
-    <option value="classic" selected>Klassiek</option>
-    <option value="chocolate">Chocolade</option>
-    <option value="strawberry">Aardbei</option>
-  </select>
-</div>
-<div class="row"><label for="sprinkles">Sprinkels</label>
-  <select id="sprinkles">
-    <option value="none" selected>Geen</option>
-    <option value="on">Aan</option>
-  </select>
-</div>
-  <div class="row"><label>Klantgegevens</label><input id="custName" placeholder="Naam"/><input id="custStreet" placeholder="Straat + nr"/><input id="custCity" placeholder="Stad"/></div>
-  <div class="actions"><button id="order">Bestel</button><button class="secondary" id="reset">Reset</button></div>
-  <div style="margin-top:10px"><span class="badge" id="price">€0,00</span></div>
-  <div style="display: none;" class="row"><label for="apiUrl"></label><input id="apiUrl"/><button class="secondary" id="saveApi">Opslaan</button></div>
-</div>
-<script type="module">// GLB-only configurator: adjust ONLY GLB materials (no extra geometry)
-// ENV → globale variabele (nu binnen het module-script i.p.v. inline in <head>)
-window.API_URL = (import.meta?.env?.VITE_API_URL || '').toString().trim();
+  <div class="panel">
+    <div class="brand"><span class="dot"></span><h1>Configurator - Ben & Jerry's</h1></div>
 
-// Gebruik Render in productie; enkel lokaal → localhost
-const DEFAULT_API =
-  (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-    ? 'http://localhost:5000'
-    : 'https://backend-tjlb.onrender.com';
+    <div class="row">
+      <label for="scoopFlavor">Bolletje</label>
+      <select id="scoopFlavor">
+        <option value="vanille" selected>Vanille</option>
+        <option value="chocolade">Chocolade</option>
+        <option value="pistache">Pistache</option>
+      </select>
+    </div>
 
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+    <div class="row">
+      <label for="coneStyle">Hoorntje</label>
+      <select id="coneStyle">
+        <option value="classic" selected>Klassiek</option>
+        <option value="chocolate">Chocolade</option>
+        <option value="strawberry">Aardbei</option>
+      </select>
+    </div>
 
-// Scene
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.01, 100);
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(devicePixelRatio);
-document.body.appendChild(renderer.domElement);
-scene.background = new THREE.Color(0xD4E9E2);
+    <div class="row">
+      <label for="sprinkles">Sprinkels</label>
+      <select id="sprinkles">
+        <option value="none" selected>Geen</option>
+        <option value="on">Aan</option>
+      </select>
+    </div>
 
-// Controls
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-controls.enablePan = false;
-controls.minDistance = 3;
-controls.maxDistance = 6.5;
-controls.minPolarAngle = Math.PI * 0.2;
-controls.maxPolarAngle = Math.PI * 0.95;
+    <div class="row">
+      <label>Klantgegevens</label>
+      <input id="custName" placeholder="Naam"/>
+      <input id="custStreet" placeholder="Straat + nr"/>
+      <input id="custCity" placeholder="Stad"/>
+    </div>
 
-// Lights
-const dir = new THREE.DirectionalLight(0xffffff, 0.9);
-dir.position.set(2,3,5);
-scene.add(dir);
-scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    <div class="actions">
+      <button id="order">Bestel</button>
+      <button class="secondary" id="reset">Reset</button>
+    </div>
 
-// Globals
-let modelGroup = new THREE.Group();
-let modelReady = false;
-let scoopMat = null, coneMat = null, sprinklesMat = null;
-let sprinklesColoredOnce = false;
+    <div style="margin-top:10px">
+      <span class="badge" id="price">€0,00</span>
+    </div>
+  </div>
 
-// Helpers
-function fitAndPlaceModel(root){
-  const box = new THREE.Box3().setFromObject(root);
-  const size = new THREE.Vector3(); box.getSize(size);
-  const center = new THREE.Vector3(); box.getCenter(center);
-  root.position.sub(center);
-  const s = 2.0 / (size.y || 1); // normalize height to ~2
-  root.scale.setScalar(s);
-  const newBox = new THREE.Box3().setFromObject(root);
-  const lift = -0.2 - newBox.min.y;
-  root.position.y += lift;
-  camera.position.set(0, 0.6, 4.5);
-  camera.lookAt(0, 0.6, 0);
-}
-function updateControlsTarget(){
-  const box = new THREE.Box3().setFromObject(modelGroup);
-  const center = new THREE.Vector3(); box.getCenter(center);
-  controls.target.set(center.x, center.y + 0.2, center.z);
-  controls.update();
-}
-function collectMaterials(root){
-  const set = new Set();
-  root.traverse(o=>{
-    if(o.isMesh){
-      if(Array.isArray(o.material)) o.material.forEach(m=>m && set.add(m));
-      else if(o.material) set.add(o.material);
+  <script type="module">
+    /* Altijd naar je Render-backend (geen localhost-fallback meer) */
+    const BASE_API = 'https://backend-tjlb.onrender.com';
+
+    // GLB-only configurator: adjust ONLY GLB materials (no extra geometry)
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+    import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+    import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
+    import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+    // Scene
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.01, 100);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(devicePixelRatio);
+    document.body.appendChild(renderer.domElement);
+    scene.background = new THREE.Color(0xD4E9E2);
+
+    // Controls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.enablePan = false;
+    controls.minDistance = 3;
+    controls.maxDistance = 6.5;
+    controls.minPolarAngle = Math.PI * 0.2;
+    controls.maxPolarAngle = Math.PI * 0.95;
+
+    // Lights
+    const dir = new THREE.DirectionalLight(0xffffff, 0.9);
+    dir.position.set(2,3,5);
+    scene.add(dir);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
+    // Globals
+    let modelGroup = new THREE.Group();
+    let modelReady = false;
+    let scoopMat = null, coneMat = null, sprinklesMat = null;
+    let sprinklesColoredOnce = false;
+
+    // Helpers
+    function fitAndPlaceModel(root){
+      const box = new THREE.Box3().setFromObject(root);
+      const size = new THREE.Vector3(); box.getSize(size);
+      const center = new THREE.Vector3(); box.getCenter(center);
+      root.position.sub(center);
+      const s = 2.0 / (size.y || 1); // normalize height to ~2
+      root.scale.setScalar(s);
+      const newBox = new THREE.Box3().setFromObject(root);
+      const lift = -0.2 - newBox.min.y;
+      root.position.y += lift;
+      camera.position.set(0, 0.6, 4.5);
+      camera.lookAt(0, 0.6, 0);
     }
-  });
-  return Array.from(set);
-}
-function detectRolesByName(mats){
-  mats.forEach(m=>{
-    const n = (m.name||'').toLowerCase();
-    if(!scoopMat && (n.includes('yellow')||n.includes('vanilla')||n.includes('cream')||n.includes('pistach'))) scoopMat = m;
-    if(!sprinklesMat && (n.includes('red')||n.includes('sprinkle'))) sprinklesMat = m;
-    if(!coneMat && (n.includes('white')||n.includes('cone')||n.includes('waffle')||n.includes('hoorn'))) coneMat = m;
-  });
-}
-function computeMaterialHeights(root){
-  // Returns a map: material.id -> { minY, maxY, centerY }
-  const map = new Map();
-  root.traverse(o=>{
-    if(!o.isMesh || !o.geometry) return;
-    const geom = o.geometry;
-    const index = geom.index;
-    const pos = geom.attributes.position;
-    const groups = geom.groups && geom.groups.length ? geom.groups : [{ start: 0, count: (index? index.count : pos.count), materialIndex: 0 }];
-    const mats = Array.isArray(o.material) ? o.material : [o.material];
-    const world = o.matrixWorld;
-    groups.forEach(g=>{
-      const mat = mats[g.materialIndex];
-      if(!mat || !pos) return;
-      let minY = Infinity, maxY = -Infinity, sumY = 0, cnt = 0;
-      if(index){
-        const end = g.start + g.count;
-        for(let i=g.start;i<end;i+=3){
-          const a = index.getX(i), b = index.getX(i+1), c = index.getX(i+2);
-          [a,b,c].forEach(vi=>{
-            const vx = pos.getX(vi), vy = pos.getY(vi), vz = pos.getZ(vi);
-            const v = new THREE.Vector3(vx,vy,vz).applyMatrix4(world);
-            if(v.y < minY) minY = v.y;
-            if(v.y > maxY) maxY = v.y;
-            sumY += v.y; cnt++;
-          });
-        }
-      }else{
-        const end = Math.min(pos.count, g.start + g.count);
-        for(let i=g.start;i<end;i++){
-          const vx = pos.getX(i), vy = pos.getY(i), vz = pos.getZ(i);
-          const v = new THREE.Vector3(vx,vy,vz).applyMatrix4(world);
-          if(v.y < minY) minY = v.y;
-          if(v.y > maxY) maxY = v.y;
-          sumY += v.y; cnt++;
-        }
-      }
-      if(cnt>0){
-        const centerY = sumY / cnt;
-        const cur = map.get(mat) || { minY, maxY, centerY };
-        // merge across multiple meshes
-        cur.minY = Math.min(cur.minY, minY);
-        cur.maxY = Math.max(cur.maxY, maxY);
-        // average centers (rough): take higher center as more scoop-like
-        cur.centerY = Math.max(cur.centerY, centerY);
-        map.set(mat, cur);
-      }
-    });
-  });
-  return map;
-}
-function flavorHex(n){
-  if(n==='vanille') return '#FFFACD';
-  if(n==='chocolade') return '#8B4513';
-  if(n==='pistache') return '#8FD19E';
-  return '#FFFACD';
-}
-function coneColor(style){
-  if(style==='classic') return 0xC68E51;      // Klassiek
-  if(style==='chocolate') return 0x5C4033;    // Chocolade
-  if(style==='strawberry') return 0xFF89B4;   // Aardbei (roze)
-  return 0xC68E51;
-}
-
-
-function colorizeSprinklesMulti(){
-  if(!sprinklesMat) return;
-  const palette = [
-    new THREE.Color(0xd0006f),
-    new THREE.Color(0x22c55e),
-    new THREE.Color(0x3b82f6),
-    new THREE.Color(0xf59e0b),
-    new THREE.Color(0x9333ea)
-  ];
-  const targets = [];
-  modelGroup.traverse(o=>{
-    if(o.isMesh){
-      const mats = Array.isArray(o.material) ? o.material : [o.material];
-      if(mats.includes(sprinklesMat)) targets.push(o);
+    function updateControlsTarget(){
+      const box = new THREE.Box3().setFromObject(modelGroup);
+      const center = new THREE.Vector3(); box.getCenter(center);
+      controls.target.set(center.x, center.y + 0.2, center.z);
+      controls.update();
     }
-  });
-  targets.forEach(mesh=>{
-    const geo = mesh.geometry;
-    if(!geo || !geo.isBufferGeometry) return;
-    const pos = geo.getAttribute('position');
-    if(!pos) return;
-    const count = pos.count;
-    const colors = new Float32Array(count * 3);
-    function hash(i){ const x = Math.sin(i*12.9898)*43758.5453; return x - Math.floor(x); }
-    for(let i=0;i<count;i++){
-      const idx = Math.floor(hash(i) * palette.length);
-      const c = palette[idx];
-      colors[i*3+0] = c.r;
-      colors[i*3+1] = c.g;
-      colors[i*3+2] = c.b;
-    }
-    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geo.attributes.color.needsUpdate = true;
-  });
-  if(sprinklesMat.vertexColors !== true) sprinklesMat.vertexColors = true;
-  if(sprinklesMat.color) sprinklesMat.color.set(0xffffff);
-  sprinklesMat.needsUpdate = true;
-  sprinklesColoredOnce = true;
-}
-
-
-// Load GLB
-(async function(){
-  try{
-    const loader = new GLTFLoader();
-    const draco = new DRACOLoader(); draco.setDecoderPath(new URL('three/examples/jsm/libs/draco/', import.meta.url).toString());
-    loader.setDRACOLoader(draco);
-    const ktx2 = new KTX2Loader(); ktx2.setTranscoderPath(new URL('three/examples/jsm/libs/basis/', import.meta.url).toString());
-    ktx2.detectSupport(renderer); loader.setKTX2Loader(ktx2);
-
-    const url = new URL('./assets/ice-cream.glb', import.meta.url).toString();
-    const gltf = await loader.loadAsync(url);
-    modelGroup = gltf.scene || gltf.scenes?.[0] || new THREE.Group();
-    scene.add(modelGroup);
-
-    // Standardize materials
-    modelGroup.traverse(o=>{
-      if(o.isMesh){
-        if(!(o.material && (o.material.isMeshStandardMaterial || o.material.isMeshPhysicalMaterial))){
-          o.material = new THREE.MeshStandardMaterial({ color: o.material?.color || 0xffffff, roughness: .9, metalness: .05 });
+    function collectMaterials(root){
+      const set = new Set();
+      root.traverse(o=>{
+        if(o.isMesh){
+          if(Array.isArray(o.material)) o.material.forEach(m=>m && set.add(m));
+          else if(o.material) set.add(o.material);
         }
-      }
-    });
-
-    fitAndPlaceModel(modelGroup);
-    const mats = collectMaterials(modelGroup);
-    // 1) name heuristic
-    detectRolesByName(mats);
-    // 2) geometric heuristic to ensure scoop/cone not swapped
-    const stat = computeMaterialHeights(modelGroup);
-    // Exclude sprinklesMat candidate (red/sprinkle) from scoop/cone decision
-    const candidates = mats.filter(m => m !== sprinklesMat);
-    // cone = material with smallest minY (lowest part)
-    let coneCandidate = null, minMinY = Infinity;
-    candidates.forEach(m=>{
-      const s = stat.get(m); if(!s) return;
-      if(s.minY < minMinY){ minMinY = s.minY; coneCandidate = m; }
-    });
-    // scoop = highest centerY (top-ish)
-    let scoopCandidate = null, maxCenterY = -Infinity;
-    candidates.forEach(m=>{
-      const s = stat.get(m); if(!s) return;
-      if(s.centerY > maxCenterY){ maxCenterY = s.centerY; scoopCandidate = m; }
-    });
-    if(coneCandidate) coneMat = coneCandidate;
-    if(scoopCandidate) scoopMat = scoopCandidate;
-
-    modelReady = true;
-
-    // Apply initial UI
-    const initFlavor = (document.getElementById('scoopFlavor')?.value)||'vanille';
-    const initCone = (document.getElementById('coneStyle')?.value)||'classic';
-    const initSpr = (document.getElementById('sprinkles')?.value)||'none';
-    if(scoopMat && scoopMat.color) scoopMat.color.set(flavorHex(initFlavor));
-    if(coneMat && coneMat.color) coneMat.color.set(coneColor(initCone));
-    if(sprinklesMat){
-      if(initSpr==='none'){ sprinklesMat.transparent = true; sprinklesMat.opacity = 0.0; }
-      else { sprinklesMat.transparent = false; sprinklesMat.opacity = 1.0; if(!sprinklesColoredOnce) colorizeSprinklesMulti(); }
+      });
+      return Array.from(set);
+    }
+    function detectRolesByName(mats){
+      mats.forEach(m=>{
+        const n = (m.name||'').toLowerCase();
+        if(!scoopMat && (n.includes('yellow')||n.includes('vanilla')||n.includes('cream')||n.includes('pistach'))) scoopMat = m;
+        if(!sprinklesMat && (n.includes('red')||n.includes('sprinkle'))) sprinklesMat = m;
+        if(!coneMat && (n.includes('white')||n.includes('cone')||n.includes('waffle')||n.includes('hoorn'))) coneMat = m;
+      });
+    }
+    function computeMaterialHeights(root){
+      const map = new Map();
+      root.traverse(o=>{
+        if(!o.isMesh || !o.geometry) return;
+        const geom = o.geometry;
+        const index = geom.index;
+        const pos = geom.attributes.position;
+        const groups = geom.groups && geom.groups.length ? geom.groups : [{ start: 0, count: (index? index.count : pos.count), materialIndex: 0 }];
+        const mats = Array.isArray(o.material) ? o.material : [o.material];
+        const world = o.matrixWorld;
+        groups.forEach(g=>{
+          const mat = mats[g.materialIndex];
+          if(!mat || !pos) return;
+          let minY = Infinity, maxY = -Infinity, sumY = 0, cnt = 0;
+          if(index){
+            const end = g.start + g.count;
+            for(let i=g.start;i<end;i+=3){
+              const a = index.getX(i), b = index.getX(i+1), c = index.getX(i+2);
+              [a,b,c].forEach(vi=>{
+                const vx = pos.getX(vi), vy = pos.getY(vi), vz = pos.getZ(vi);
+                const v = new THREE.Vector3(vx,vy,vz).applyMatrix4(world);
+                if(v.y < minY) minY = v.y;
+                if(v.y > maxY) maxY = v.y;
+                sumY += v.y; cnt++;
+              });
+            }
+          }else{
+            const end = Math.min(pos.count, g.start + g.count);
+            for(let i=g.start;i<end;i++){
+              const vx = pos.getX(i), vy = pos.getY(i), vz = pos.getZ(i);
+              const v = new THREE.Vector3(vx,vy,vz).applyMatrix4(world);
+              if(v.y < minY) minY = v.y;
+              if(v.y > maxY) maxY = v.y;
+              sumY += v.y; cnt++;
+            }
+          }
+          if(cnt>0){
+            const centerY = sumY / cnt;
+            const cur = map.get(mat) || { minY, maxY, centerY };
+            cur.minY = Math.min(cur.minY, minY);
+            cur.maxY = Math.max(cur.maxY, maxY);
+            cur.centerY = Math.max(cur.centerY, centerY);
+            map.set(mat, cur);
+          }
+        });
+      });
+      return map;
+    }
+    function flavorHex(n){
+      if(n==='vanille') return '#FFFACD';
+      if(n==='chocolade') return '#8B4513';
+      if(n==='pistache') return '#8FD19E';
+      return '#FFFACD';
+    }
+    function coneColor(style){
+      if(style==='classic') return 0xC68E51;
+      if(style==='chocolate') return 0x5C4033;
+      if(style==='strawberry') return 0xFF89B4;
+      return 0xC68E51;
+    }
+    function colorizeSprinklesMulti(){
+      if(!sprinklesMat) return;
+      const palette = [
+        new THREE.Color(0xd0006f),
+        new THREE.Color(0x22c55e),
+        new THREE.Color(0x3b82f6),
+        new THREE.Color(0xf59e0b),
+        new THREE.Color(0x9333ea)
+      ];
+      const targets = [];
+      modelGroup.traverse(o=>{
+        if(o.isMesh){
+          const mats = Array.isArray(o.material) ? o.material : [o.material];
+          if(mats.includes(sprinklesMat)) targets.push(o);
+        }
+      });
+      targets.forEach(mesh=>{
+        const geo = mesh.geometry;
+        if(!geo || !geo.isBufferGeometry) return;
+        const pos = geo.getAttribute('position');
+        if(!pos) return;
+        const count = pos.count;
+        const colors = new Float32Array(count * 3);
+        function hash(i){ const x = Math.sin(i*12.9898)*43758.5453; return x - Math.floor(x); }
+        for(let i=0;i<count;i++){
+          const idx = Math.floor(hash(i) * palette.length);
+          const c = palette[idx];
+          colors[i*3+0] = c.r;
+          colors[i*3+1] = c.g;
+          colors[i*3+2] = c.b;
+        }
+        geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geo.attributes.color.needsUpdate = true;
+      });
+      if(sprinklesMat.vertexColors !== true) sprinklesMat.vertexColors = true;
+      if(sprinklesMat.color) sprinklesMat.color.set(0xffffff);
       sprinklesMat.needsUpdate = true;
+      sprinklesColoredOnce = true;
     }
-    updateControlsTarget();
-  }catch(e){
-    console.error('GLB laden mislukt', e);
-    // Fallback (geen extra geometry-wens, maar tonen we basic vormen voor debug)
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.5,1.4,32), new THREE.MeshStandardMaterial({ color: 0xC68E51, roughness: .9, metalness: .05 }));
-    cone.position.y = -0.2;
-    const scoop = new THREE.Mesh(new THREE.SphereGeometry(0.6,32,16), new THREE.MeshStandardMaterial({ color: 0xFFFACD, roughness: .9 }));
-    scoop.position.y = 0.6;
-    const fallback = new THREE.Group(); fallback.add(cone); fallback.add(scoop); scene.add(fallback);
-    modelGroup = fallback;
-    modelReady = true;
-    updateControlsTarget();
-  }
-})();
 
-// UI wiring
-function updatePrice(){
-  let price = 3;
-  const spr = document.getElementById('sprinkles')?.value;
-  if(spr==='on') price += 1;
-  document.getElementById('price').textContent = '€' + Math.round(price);
-}
-updatePrice();
+    // Load GLB
+    (async function(){
+      try{
+        const loader = new GLTFLoader();
+        const draco = new DRACOLoader(); draco.setDecoderPath(new URL('three/examples/jsm/libs/draco/', import.meta.url).toString());
+        loader.setDRACOLoader(draco);
+        const ktx2 = new KTX2Loader(); ktx2.setTranscoderPath(new URL('three/examples/jsm/libs/basis/', import.meta.url).toString());
+        ktx2.detectSupport(renderer); loader.setKTX2Loader(ktx2);
 
-document.getElementById('sprinkles').addEventListener('change', e => {
-  const v = e.target.value;
-  if(sprinklesMat){
-    if(v==='none'){ sprinklesMat.transparent = true; sprinklesMat.opacity = 0.0; }
-    else { sprinklesMat.transparent = false; sprinklesMat.opacity = 1.0; if(!sprinklesColoredOnce) colorizeSprinklesMulti(); }
-    sprinklesMat.needsUpdate = true;
-  }
-  updatePrice();
-});
-document.getElementById('scoopFlavor').addEventListener('change', e => {
-  const v = e.target.value;
-  const hex = flavorHex(v);
-  if (scoopMat && scoopMat.color) { scoopMat.color.set(hex); scoopMat.needsUpdate = true; }
-});
-document.getElementById('coneStyle').addEventListener('change', e => {
-  const v = e.target.value;
-  const col = coneColor(v);
-  if(coneMat && coneMat.color){ coneMat.color.set(col); coneMat.needsUpdate = true; }
-});
+        const url = new URL('./assets/ice-cream.glb', import.meta.url).toString();
+        const gltf = await loader.loadAsync(url);
+        modelGroup = gltf.scene || gltf.scenes?.[0] || new THREE.Group();
+        scene.add(modelGroup);
 
-document.getElementById('reset').addEventListener('click', () => {
-  const f = document.getElementById('scoopFlavor');
-  const spr = document.getElementById('sprinkles');
-  const coneSel = document.getElementById('coneStyle');
-  f.value = 'vanille'; spr.value = 'none'; coneSel.value = 'classic';
-  if (scoopMat && scoopMat.color) { scoopMat.color.set(flavorHex('vanille')); scoopMat.needsUpdate = true; }
-  if (coneMat && coneMat.color) { coneMat.color.set(coneColor('classic')); coneMat.needsUpdate = true; }
-  if (sprinklesMat){ sprinklesMat.transparent = true; sprinklesMat.opacity = 0.0; sprinklesMat.needsUpdate = true; }
-  updatePrice();
-});
+        // Standardize materials
+        modelGroup.traverse(o=>{
+          if(o.isMesh){
+            if(!(o.material && (o.material.isMeshStandardMaterial || o.material.isMeshPhysicalMaterial))){
+              o.material = new THREE.MeshStandardMaterial({ color: o.material?.color || 0xffffff, roughness: .9, metalness: .05 });
+            }
+          }
+        });
 
-// API base
-const API_URL_EL = document.getElementById('apiUrl');
-const API_URL = (localStorage.getItem('API_URL')||'').trim();
-if(API_URL) API_URL_EL.value = API_URL;
-document.getElementById('saveApi').addEventListener('click', ()=>{
-  const v = (API_URL_EL.value||'').trim();
-  if(v) localStorage.setItem('API_URL', v); else localStorage.removeItem('API_URL');
-  alert('API URL opgeslagen' + (v?': '+v:''));
-});
+        fitAndPlaceModel(modelGroup);
+        const mats = collectMaterials(modelGroup);
+        detectRolesByName(mats);
+        const stat = computeMaterialHeights(modelGroup);
+        const candidates = mats.filter(m => m !== sprinklesMat);
+        let coneCandidate = null, minMinY = Infinity;
+        candidates.forEach(m=>{ const s = stat.get(m); if(!s) return; if(s.minY < minMinY){ minMinY = s.minY; coneCandidate = m; } });
+        let scoopCandidate = null, maxCenterY = -Infinity;
+        candidates.forEach(m=>{ const s = stat.get(m); if(!s) return; if(s.centerY > maxCenterY){ maxCenterY = s.centerY; scoopCandidate = m; } });
+        if(coneCandidate) coneMat = coneCandidate;
+        if(scoopCandidate) scoopMat = scoopCandidate;
 
-// Order
-function flavorHexPlain(n){ if(n==='vanille')return'#FFFACD'; if(n==='chocolade')return'#8B4513'; if(n==='pistache')return'#8FD19E'; return'#FFFACD'; }
-async function placeOrder(){
-  const base = (window.API_URL || localStorage.getItem('API_URL') || DEFAULT_API)
-  .toString()
-  .trim();
+        modelReady = true;
 
-  const scoopFlavor = document.getElementById('scoopFlavor').value;
-  const sprinklesLevel = document.getElementById('sprinkles').value;
-  const coneStyle = document.getElementById('coneStyle').value;
-  const custName = document.getElementById('custName').value.trim();
-  const street = document.getElementById('custStreet').value.trim();
-  const city = document.getElementById('custCity').value.trim();
-  const priceTxt = document.getElementById('price').textContent.replace('€','').trim();
-  const priceNum = parseInt(priceTxt, 10) || 0;
+        // Apply initial UI
+        const initFlavor = (document.getElementById('scoopFlavor')?.value)||'vanille';
+        const initCone = (document.getElementById('coneStyle')?.value)||'classic';
+        const initSpr = (document.getElementById('sprinkles')?.value)||'none';
+        if(scoopMat && scoopMat.color) scoopMat.color.set(flavorHex(initFlavor));
+        if(coneMat && coneMat.color) coneMat.color.set(coneColor(initCone));
+        if(sprinklesMat){
+          if(initSpr==='none'){ sprinklesMat.transparent = true; sprinklesMat.opacity = 0.0; }
+          else { sprinklesMat.transparent = false; sprinklesMat.opacity = 1.0; if(!sprinklesColoredOnce) colorizeSprinklesMulti(); }
+          sprinklesMat.needsUpdate = true;
+        }
+        updateControlsTarget();
+      }catch(e){
+        console.error('GLB laden mislukt', e);
+        const cone = new THREE.Mesh(new THREE.ConeGeometry(0.5,1.4,32), new THREE.MeshStandardMaterial({ color: 0xC68E51, roughness: .9, metalness: .05 }));
+        cone.position.y = -0.2;
+        const scoop = new THREE.Mesh(new THREE.SphereGeometry(0.6,32,16), new THREE.MeshStandardMaterial({ color: 0xFFFACD, roughness: .9 }));
+        scoop.position.y = 0.6;
+        const fallback = new THREE.Group(); fallback.add(cone); fallback.add(scoop); scene.add(fallback);
+        modelGroup = fallback;
+        modelReady = true;
+        updateControlsTarget();
+      }
+    })();
 
-  const payload = {
-    scoop: { flavor: scoopFlavor, color: flavorHexPlain(scoopFlavor) },
-    cone: { style: coneStyle, color: '#' + new THREE.Color(coneColor(coneStyle)).getHexString() },
-    sprinkles: { level: sprinklesLevel },
-    customer: { name: custName, address: { street, city } },
-    price: priceNum
-  };
+    // UI wiring
+    function updatePrice(){
+      let price = 3;
+      const spr = document.getElementById('sprinkles')?.value;
+      if(spr==='on') price += 1;
+      document.getElementById('price').textContent = '€' + Math.round(price);
+    }
+    updatePrice();
 
-  try{
-    const res = await fetch(base + '/api/orders', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
-    const data = await res.json().catch(()=>({}));
-    if(!res.ok){ alert('Fout bij bestelling: ' + (data?.message || res.status)); return; }
-    alert('Bestelling geplaatst!');
-  }catch(err){ alert('Netwerkfout: ' + err.message); }
-}
-document.getElementById('order').addEventListener('click', placeOrder);
+    document.getElementById('sprinkles').addEventListener('change', e => {
+      const v = e.target.value;
+      if(sprinklesMat){
+        if(v==='none'){ sprinklesMat.transparent = true; sprinklesMat.opacity = 0.0; }
+        else { sprinklesMat.transparent = false; sprinklesMat.opacity = 1.0; if(!sprinklesColoredOnce) colorizeSprinklesMulti(); }
+        sprinklesMat.needsUpdate = true;
+      }
+      updatePrice();
+    });
+    document.getElementById('scoopFlavor').addEventListener('change', e => {
+      const v = e.target.value;
+      const hex = flavorHex(v);
+      if (scoopMat && scoopMat.color) { scoopMat.color.set(hex); scoopMat.needsUpdate = true; }
+    });
+    document.getElementById('coneStyle').addEventListener('change', e => {
+      const v = e.target.value;
+      const col = coneColor(v);
+      if(coneMat && coneMat.color){ coneMat.color.set(col); coneMat.needsUpdate = true; }
+    });
 
-// Resize & animate
-addEventListener('resize', () => {
-  camera.aspect = innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-});
-(function animate(){
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
-})();</script>
-</body></html>
+    document.getElementById('reset').addEventListener('click', () => {
+      const f = document.getElementById('scoopFlavor');
+      const spr = document.getElementById('sprinkles');
+      const coneSel = document.getElementById('coneStyle');
+      f.value = 'vanille'; spr.value = 'none'; coneSel.value = 'classic';
+      if (scoopMat && scoopMat.color) { scoopMat.color.set(flavorHex('vanille')); scoopMat.needsUpdate = true; }
+      if (coneMat && coneMat.color) { coneMat.color.set(coneColor('classic')); coneMat.needsUpdate = true; }
+      if (sprinklesMat){ sprinklesMat.transparent = true; sprinklesMat.opacity = 0.0; sprinklesMat.needsUpdate = true; }
+      updatePrice();
+    });
+
+    // Order
+    function flavorHexPlain(n){ if(n==='vanille')return'#FFFACD'; if(n==='chocolade')return'#8B4513'; if(n==='pistache')return'#8FD19E'; return'#FFFACD'; }
+    async function placeOrder(){
+      const base = BASE_API;
+
+      const scoopFlavor = document.getElementById('scoopFlavor').value;
+      const sprinklesLevel = document.getElementById('sprinkles').value;
+      const coneStyle = document.getElementById('coneStyle').value;
+      const custName = document.getElementById('custName').value.trim();
+      const street = document.getElementById('custStreet').value.trim();
+      const city = document.getElementById('custCity').value.trim();
+      const priceTxt = document.getElementById('price').textContent.replace('€','').trim();
+      const priceNum = parseInt(priceTxt, 10) || 0;
+
+      const payload = {
+        scoop: { flavor: scoopFlavor, color: flavorHexPlain(scoopFlavor) },
+        cone: { style: coneStyle, color: '#' + new THREE.Color(coneColor(coneStyle)).getHexString() },
+        sprinkles: { level: sprinklesLevel },
+        customer: { name: custName, address: { street, city } },
+        price: priceNum
+      };
+
+      try{
+        const url = base + '/api/orders';
+        const res = await fetch(url, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(()=>({}));
+        if(!res.ok){ alert('Fout bij bestelling: ' + (data?.message || res.status)); return; }
+        alert('Bestelling geplaatst!');
+      }catch(err){
+        alert('Netwerkfout: ' + err.message);
+      }
+    }
+    document.getElementById('order').addEventListener('click', placeOrder);
+
+    // Resize & animate
+    addEventListener('resize', () => {
+      camera.aspect = innerWidth/innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+    (function animate(){
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+  </script>
+</body>
+</html>
